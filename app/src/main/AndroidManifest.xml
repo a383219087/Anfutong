@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.chinasafety.cqj.anfutong">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
+    <application
+        android:name=".view.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/dargon108"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.baidu.location.service_v2.2"/>
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="FsRnVr1wyXUGaCVW6okDwQ5gXL0DgDOx"/>
+
+        <activity
+            android:name=".view.activity.SplashActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".view.activity.LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.CompanyListActivity"
+            android:label="公司列表"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.HomePageActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.AudioRecordActivity"
+            android:label="录音"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.CameraTestActivity"
+            android:label="二维码扫描"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.JcbDetailActivity"
+            android:label="详情"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.widget.zxing.activity.MipcaActivityCapture"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.SafeCheckActivity"
+            android:label="安全检查"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.YhfcUploadActivity"
+            android:label="隐患复查"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.ShowImageActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.YhDetailActivity"
+            android:label="隐患详情"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.activity.SafeReviewActivity"
+            android:label="以下隐患已反馈未复查"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.activity.CompanySearchActivity"/>
+        <activity
+            android:name=".view.activity.MapSelectActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:label="附近的服务公司"/>
+        <activity android:name=".view.activity.OneCompanyMapActivity">
+        </activity>
+    </application>
+
+</manifest>
