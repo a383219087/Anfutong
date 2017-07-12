@@ -12,6 +12,8 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,7 @@ import org.chinasafety.cqj.anfutong.presenter.impl.YhdjPresenterCompl;
 import org.chinasafety.cqj.anfutong.utils.StringUtils;
 import org.chinasafety.cqj.anfutong.view.activity.AudioRecordActivity;
 import org.chinasafety.cqj.anfutong.view.activity.CameraTestActivity;
+import org.chinasafety.cqj.anfutong.view.activity.CompanySearchActivity;
 import org.chinasafety.cqj.anfutong.view.activity.JcbDetailActivity;
 import org.chinasafety.cqj.anfutong.view.adapter.MySpinnerAdapter;
 import org.chinasafety.cqj.anfutong.view.widget.my_camera.ITakePhotoListener;
@@ -71,7 +74,7 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
     private ImageView mJcbDetailPre, mJcbDetailNext;
     private TextView mJcbPositionTv, mJcbCountTv;
     private Spinner mJcbSp, mCsSp, mSbSp, mRwSp, mYhdjSp;
-    private Spinner mSpCheckedCompany;
+//    private Spinner mSpCheckedCompany;
     private EditText mYgfyEdt, mJyzgEdt, mDateZg;
     private Button mJcbDetail;
     private TextView mPhotoCount;
@@ -87,6 +90,7 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
     private int mEwmSssbId;
     private LinearLayout mLnSb;
     private EditText mEdtPlace;
+//    private Button mBtnToCompany;
 
     public static AqjcFragment newInstance(String orgId,String orgIdStr) {
         Bundle args = new Bundle();
@@ -116,6 +120,11 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
 
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
     private void initComplement() {
         mCalendar = Calendar.getInstance();
         mMyCamera = (MyCamera) mView.findViewById(R.id.my_camera);
@@ -141,9 +150,10 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
         mJyzgEdt = (EditText) mView.findViewById(R.id.zgcs_edit);
         mJcbDetail = (Button) mView.findViewById(R.id.jcb_detail_btn);
         mDateZg = (EditText) mView.findViewById(R.id.date_yhzg_edit);
-        mSpCheckedCompany = (Spinner) mView.findViewById(R.id.checked_company);
+//        mSpCheckedCompany = (Spinner) mView.findViewById(R.id.checked_company);
         mLnSb = (LinearLayout) mView.findViewById(R.id.sb_ln);
         mEdtPlace = (EditText) mView.findViewById(R.id.cs_edit);
+//        mBtnToCompany = (Button) mView.findViewById(R.id.to_company_search);
         mCache = new File(Environment.getExternalStorageDirectory(),
                 "hwaftCache");
         if (!mCache.exists())
@@ -157,7 +167,7 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
             pE.printStackTrace();
         }
         mPresenter = new YhdjPresenterCompl(this);
-        mPresenter.getCheckedCompany();
+//        mPresenter.getCheckedCompany();
         mPresenter.orgIdToComId(getArguments().getString(KEY_ORG_ID_STR));
     }
 
@@ -197,6 +207,7 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
         mQrCodeBtn.setOnClickListener(this);
         mJcbDetail.setOnClickListener(this);
         mCommitBtn.setOnClickListener(this);
+//        mBtnToCompany.setOnClickListener(this);
         mDateZg.setInputType(InputType.TYPE_DATETIME_VARIATION_NORMAL);
         mDateZg.setOnClickListener(new View.OnClickListener() {
 
@@ -300,29 +311,29 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
 
             }
         });
-        mSpCheckedCompany.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                IChooseItem item = (IChooseItem) adapterView.getItemAtPosition(i);
-                mPresenter.orgIdToComId(item.getCsId());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+//        mSpCheckedCompany.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                IChooseItem item = (IChooseItem) adapterView.getItemAtPosition(i);
+//                mPresenter.orgIdToComId(item.getCsId());
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
     }
 
 
     @Override
     public void setCheckedCompanyList(List<SearchCompanyInfo> companys) {
-        MySpinnerAdapter<SearchCompanyInfo> adapter = new MySpinnerAdapter<>(companys, getActivity());
-        mSpCheckedCompany.setAdapter(adapter);
-        int position = adapter.selectItemById(String.valueOf(mObjOrganizationID));
-        if (position != -1) {
-            mSpCheckedCompany.setSelection(position);
-        }
+//        MySpinnerAdapter<SearchCompanyInfo> adapter = new MySpinnerAdapter<>(companys, getActivity());
+//        mSpCheckedCompany.setAdapter(adapter);
+//        int position = adapter.selectItemById(String.valueOf(mObjOrganizationID));
+//        if (position != -1) {
+//            mSpCheckedCompany.setSelection(position);
+//        }
     }
 
     @Override

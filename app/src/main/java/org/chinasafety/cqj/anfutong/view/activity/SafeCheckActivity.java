@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import org.chinasafety.cqj.anfutong.R;
@@ -33,10 +34,18 @@ public class SafeCheckActivity extends BaseActivity {
                 .commitAllowingStateLoss();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_safe_check_switch,menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            finish();
+        }else if(item.getItemId() ==R.id.switch_company){
+            CompanySearchActivity.start(this);
             finish();
         }
         return true;

@@ -90,12 +90,14 @@
             android:name=".view.activity.SafeReviewActivity"
             android:label="以下隐患已反馈未复查"
             android:screenOrientation="portrait"/>
-        <activity android:name=".view.activity.CompanySearchActivity"/>
+        <activity android:name=".view.activity.CompanySearchActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".view.activity.MapSelectActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
-            android:label="附近的服务公司"/>
+            android:label="附近的服务对象"/>
         <activity android:name=".view.activity.OneCompanyMapActivity">
         </activity>
     </application>

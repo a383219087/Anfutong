@@ -1,5 +1,6 @@
 package org.chinasafety.cqj.anfutong.view.activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.chinasafety.cqj.anfutong.R;
+import org.chinasafety.cqj.anfutong.model.CompanyDetailInfo;
 import org.chinasafety.cqj.anfutong.model.SearchCompanyInfo;
 import org.chinasafety.cqj.anfutong.model.provider.ServiceCompanyProvider;
 import org.chinasafety.cqj.anfutong.view.BaseActivity;
@@ -21,6 +24,7 @@ import org.chinasafety.cqj.anfutong.view.adapter.LinearLayoutManagerWrapper;
 import org.chinasafety.cqj.anfutong.view.adapter.RecyclerBaseAdapter;
 import org.chinasafety.cqj.anfutong.view.adapter.RecyclerItemDecoration;
 import org.chinasafety.cqj.anfutong.view.adapter.viewholder.SearchCompanyHolder;
+import org.chinasafety.cqj.anfutong.view.widget.sweet_dialog.SweetAlertDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +40,10 @@ public class CompanySearchActivity extends BaseActivity {
     private Button mBtnSearch;
     private EditText mEdtSearch;
     private ProgressBar mProgressBar;
-    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private RecyclerBaseAdapter<SearchCompanyInfo, SearchCompanyHolder> mAdapter;
     private List<SearchCompanyInfo> mDataListForSearch = new ArrayList<>();
+    private Disposable mDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +86,8 @@ public class CompanySearchActivity extends BaseActivity {
 
                     @Override
                     public void onNext(SearchCompanyInfo value) {
-                        OneCompanyMapActivity.start(CompanySearchActivity.this,value.getCompanyId());
+                        getDetail(value.getCompanyId());
+//                        OneCompanyMapActivity.start(CompanySearchActivity.this,value.getCompanyId());
                     }
 
                     @Override
@@ -95,6 +101,44 @@ public class CompanySearchActivity extends BaseActivity {
                     }
                 });
         mBtnSearch.setOnClickListener(mClickListener);
+    }
+
+    private void getDetail(String id) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("请稍后……");
+        progressDialog.show();
+        ServiceCompanyProvider.getCompanyDetail(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<CompanyDetailInfo>() {
+
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(CompanyDetailInfo value) {
+                        progressDialog.dismiss();
+                        if(value!=null) {
+                            SafeCheckActivity.start(CompanySearchActivity.this, value.getId(), value.getIdStr());
+                        }else{
+                            Toast.makeText(CompanySearchActivity.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        progressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     private View.OnClickListener mClickListener = new View.OnClickListener() {
@@ -152,6 +196,9 @@ public class CompanySearchActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mCompositeDisposable.dispose();
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
     }
 
     public static void start(Context context) {
