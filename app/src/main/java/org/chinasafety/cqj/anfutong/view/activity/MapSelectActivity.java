@@ -65,7 +65,7 @@ public class MapSelectActivity extends BaseActivity implements IMapSelectPresent
     private IMapSelectPresenter mPresenter;
     private BaiduMap mBaiduMap;
     private CompanyMapDetailFragment mDetailFragment;
-    private MapCompanyListFragment mCompanyListFragment;
+//    private MapCompanyListFragment mCompanyListFragment;
     private final HashMap<Marker, CompanyDetailInfo> mMarkerList = new HashMap<>();
     private MapView mMapView;
     private final CompositeDisposable mListenerDisposable = new CompositeDisposable();
@@ -92,9 +92,9 @@ public class MapSelectActivity extends BaseActivity implements IMapSelectPresent
         mPresenter = getPresenter();
         mPlanSearch = RoutePlanSearch.newInstance();
         mDetailFragment = CompanyMapDetailFragment.newInstance();
-        mCompanyListFragment = MapCompanyListFragment.newInstance();
-        mCompanyListFragment.setItemClickAction(mClickCallback);
-        addListFragment();
+//        mCompanyListFragment = MapCompanyListFragment.newInstance();
+//        mCompanyListFragment.setItemClickAction(mClickCallback);
+//        addListFragment();
     }
 
     protected IMapSelectPresenter getPresenter() {
@@ -241,28 +241,24 @@ public class MapSelectActivity extends BaseActivity implements IMapSelectPresent
         }
     };
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_map_select_search, menu);
-        SearchView searchView = (SearchView) menu.findItem(R.id.map_select_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "onQueryTextChange: " + newText);
-                if (!mCompanyListFragment.isAdded()) {
-                    addListFragment();
-                }
-                mCompanyListFragment.search(newText);
-                return true;
-            }
-        });
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.activity_map_select_search, menu);
+//        SearchView searchView = (SearchView) menu.findItem(R.id.map_select_search).getActionView();
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//
+//                return true;
+//            }
+//        });
+//        return true;
+//    }
 
     private static final String TAG = "MapSelectActivity";
 
@@ -395,9 +391,4 @@ public class MapSelectActivity extends BaseActivity implements IMapSelectPresent
         }
     }
 
-    private void addListFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.map_override_view, mCompanyListFragment)
-                .commit();
-    }
 }

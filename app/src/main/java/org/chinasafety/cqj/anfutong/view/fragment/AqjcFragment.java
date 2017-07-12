@@ -135,6 +135,7 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
         mAudioBtn = (Button) mView.findViewById(R.id.xcly_btn);
         mCallBtn = (ImageButton) mView.findViewById(R.id.bddh_btn);
         mCommitBtn = (Button) mView.findViewById(R.id.commit_btn);
+        mCommitBtn.setEnabled(false);
         mJcbLn = (LinearLayout) mView.findViewById(R.id.jcb_ln);
         mJcbDetailEdit = (EditText) mView.findViewById(R.id.jcb_edit);
         mJcbDetailPre = (ImageView) mView.findViewById(R.id.jcbdetail_pre);
@@ -352,6 +353,7 @@ public class AqjcFragment extends Fragment implements IYhdjPresenter.View, View.
     public void getJcbDataSuccess(List<JcbInfo> data) {
         MySpinnerAdapter<JcbInfo> adapter = new MySpinnerAdapter<>(data, getActivity());
         mJcbSp.setAdapter(adapter);
+        mCommitBtn.setEnabled(true);
     }
 
     @Override
