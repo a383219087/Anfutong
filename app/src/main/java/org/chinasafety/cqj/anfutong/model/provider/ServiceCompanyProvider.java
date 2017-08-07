@@ -58,7 +58,7 @@ public class ServiceCompanyProvider {
                         ArrayList<HashMap<String, Object>> result = null;
                         try {
                             result = WebServiceUtil.getWebServiceMsg(keys2, values2,
-                                    "getRelationOrgFromDistance",new String[]{"relOrgName","relOrgID"}, WebServiceUtil.HUIWEI_URL, WebServiceUtil.HUIWEI_NAMESPACE);
+                                    "getRelationOrgFromDistance",new String[]{"relOrgName","relOrgID","orgidstr"}, WebServiceUtil.HUIWEI_URL, WebServiceUtil.HUIWEI_NAMESPACE);
                         } catch (InterruptedIOException e1) {
                             e.onError(e1);
                         }
@@ -67,6 +67,7 @@ public class ServiceCompanyProvider {
                                 SearchCompanyInfo info =new SearchCompanyInfo();
                                 info.setCompanyId(StringUtils.noNull(map.get("relOrgID")));
                                 info.setCompanyName(StringUtils.noNull(map.get("relOrgName")));
+                                info.setOrgIdStr(StringUtils.noNull(map.get("orgidstr")));
                                 e.onNext(info);
                             }
                         }
@@ -101,6 +102,8 @@ public class ServiceCompanyProvider {
                     CompanyDetailInfo detailInfo = CompanyDetailInfo.fromMap(result.get(0));
                     detailInfo.setId(orgId);
                     e.onNext(detailInfo);
+                }else{
+                    e.onNext(null);
                 }
                 e.onComplete();
             }

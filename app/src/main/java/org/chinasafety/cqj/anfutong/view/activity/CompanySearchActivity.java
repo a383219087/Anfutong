@@ -86,7 +86,8 @@ public class CompanySearchActivity extends BaseActivity {
 
                     @Override
                     public void onNext(SearchCompanyInfo value) {
-                        getDetail(value.getCompanyId());
+                        SafeCheckActivity.start(CompanySearchActivity.this, value.getCompanyId(), value.getCsId());
+//                        getDetail(value.getCompanyId());
 //                        OneCompanyMapActivity.start(CompanySearchActivity.this,value.getCompanyId());
                     }
 
@@ -121,11 +122,10 @@ public class CompanySearchActivity extends BaseActivity {
 
                     @Override
                     public void onNext(CompanyDetailInfo value) {
-                        progressDialog.dismiss();
                         if(value!=null) {
                             SafeCheckActivity.start(CompanySearchActivity.this, value.getId(), value.getIdStr());
                         }else{
-                            Toast.makeText(CompanySearchActivity.this, "获取数据失败，请重试", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CompanySearchActivity.this, "获取数据为空，请重试", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -136,7 +136,7 @@ public class CompanySearchActivity extends BaseActivity {
 
                     @Override
                     public void onComplete() {
-
+                        progressDialog.dismiss();
                     }
                 });
     }
