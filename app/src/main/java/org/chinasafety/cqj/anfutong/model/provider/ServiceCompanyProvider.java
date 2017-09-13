@@ -58,7 +58,7 @@ public class ServiceCompanyProvider {
                         ArrayList<HashMap<String, Object>> result = null;
                         try {
                             result = WebServiceUtil.getWebServiceMsg(keys2, values2,
-                                    "getRelationOrgFromDistance",new String[]{"relOrgName","relOrgID","orgidstr"}, WebServiceUtil.HUIWEI_URL, WebServiceUtil.HUIWEI_NAMESPACE);
+                                    "getRelationOrgFromDistance",new String[]{"relOrgName","relOrgID"}, WebServiceUtil.HUIWEI_URL, WebServiceUtil.HUIWEI_NAMESPACE);
                         } catch (InterruptedIOException e1) {
                             e.onError(e1);
                         }
@@ -67,7 +67,6 @@ public class ServiceCompanyProvider {
                                 SearchCompanyInfo info =new SearchCompanyInfo();
                                 info.setCompanyId(StringUtils.noNull(map.get("relOrgID")));
                                 info.setCompanyName(StringUtils.noNull(map.get("relOrgName")));
-                                info.setOrgIdStr(StringUtils.noNull(map.get("orgidstr")));
                                 e.onNext(info);
                             }
                         }
@@ -102,8 +101,25 @@ public class ServiceCompanyProvider {
                     CompanyDetailInfo detailInfo = CompanyDetailInfo.fromMap(result.get(0));
                     detailInfo.setId(orgId);
                     e.onNext(detailInfo);
+                }
+                e.onComplete();
+            }
+        });
+    }
+
+    public static Observable<Boolean> setLocation(final String orgId, final double lat, final double lon, final double alt) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> e) throws Exception {
+                String keys2[] = {"orgid", "lon","lat","alt"};
+                Object values2[] = {
+                        orgId,lon,lat,alt};
+                ArrayList<HashMap<String, Object>> result = WebServiceUtil.getWebServiceMsg(keys2, values2,
+                        "setOrgLocation", WebServiceUtil.HUIWEI_URL, WebServiceUtil.HUIWEI_NAMESPACE);
+                if(result.size()>0 && result.get(0)!=null && result.get(0).containsKey("error")){
+                    e.onNext(false);
                 }else{
-                    e.onNext(null);
+                    e.onNext(true);
                 }
                 e.onComplete();
             }

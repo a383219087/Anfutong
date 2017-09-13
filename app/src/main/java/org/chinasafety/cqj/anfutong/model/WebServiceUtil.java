@@ -198,13 +198,17 @@ public class WebServiceUtil {
         HttpTransportSE ht = new HttpTransportSE(url, 5000);
         ht.call(actionUrl, envelope);
         SoapObject result = null;
+        ArrayList<HashMap<String, Object>> datas = new ArrayList<>();
         try {
             result = (SoapObject) envelope.bodyIn;
         } catch (Exception e) {
             SoapFault soaF = (SoapFault) envelope.bodyIn;
             System.out.println("FaultString:" + soaF.faultstring);
+            HashMap<String,Object> error = new HashMap<>();
+            error.put("error",soaF.faultstring);
+            datas.add(error);
+            return datas;
         }
-        ArrayList<HashMap<String, Object>> datas = new ArrayList<HashMap<String, Object>>();
         if (result != null) {
             String resultStr = "";
             try {

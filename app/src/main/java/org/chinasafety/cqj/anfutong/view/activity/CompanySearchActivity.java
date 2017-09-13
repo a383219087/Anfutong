@@ -1,6 +1,5 @@
 package org.chinasafety.cqj.anfutong.view.activity;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,16 +14,22 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.mapapi.model.LatLng;
+
 import org.chinasafety.cqj.anfutong.R;
-import org.chinasafety.cqj.anfutong.model.CompanyDetailInfo;
 import org.chinasafety.cqj.anfutong.model.SearchCompanyInfo;
 import org.chinasafety.cqj.anfutong.model.provider.ServiceCompanyProvider;
+import org.chinasafety.cqj.anfutong.utils.rxbus.RxBus;
+import org.chinasafety.cqj.anfutong.utils.rxbus.event.SetLocationEvent;
 import org.chinasafety.cqj.anfutong.view.BaseActivity;
+import org.chinasafety.cqj.anfutong.view.MyApplication;
 import org.chinasafety.cqj.anfutong.view.adapter.LinearLayoutManagerWrapper;
 import org.chinasafety.cqj.anfutong.view.adapter.RecyclerBaseAdapter;
 import org.chinasafety.cqj.anfutong.view.adapter.RecyclerItemDecoration;
 import org.chinasafety.cqj.anfutong.view.adapter.viewholder.SearchCompanyHolder;
-import org.chinasafety.cqj.anfutong.view.widget.sweet_dialog.SweetAlertDialog;
+import org.chinasafety.cqj.anfutong.view.widget.baidu_map_support.service.LocationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,17 +38,34 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class CompanySearchActivity extends BaseActivity {
 
+    private LocationService locationService;
     private Button mBtnSearch;
     private EditText mEdtSearch;
     private ProgressBar mProgressBar;
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private RecyclerBaseAdapter<SearchCompanyInfo, SearchCompanyHolder> mAdapter;
     private List<SearchCompanyInfo> mDataListForSearch = new ArrayList<>();
-    private Disposable mDisposable;
+    private LatLng mLatLng;
+    private double mAltitude;
+
+    private BDLocationListener mListener = new BDLocationListener() {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            if (null != location && location.getLocType() != BDLocation.TypeServerError) {
+                mLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                mAltitude = location.getAltitude();
+            }
+        }
+
+        public void onConnectHotSpotMessage(String s, int i) {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +91,69 @@ public class CompanySearchActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        locationService = ((MyApplication) getApplication()).locationService;
+        locationService.registerListener(mListener);
+        locationService.setLocationOption(locationService.getDefaultLocationClientOption());
+        locationService.start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RxBus.getInstance().observer(SetLocationEvent.class)
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        mCompositeDisposable.add(disposable);
+                    }
+                })
+                .subscribe(new Consumer<SetLocationEvent>() {
+                    @Override
+                    public void accept(SetLocationEvent setLocationEvent) throws Exception {
+                        if(mLatLng==null){
+                            Toast.makeText(CompanySearchActivity.this, "暂未获取到当前位置信息，请稍后再试", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (setLocationEvent == null) {
+                            return;
+                        }
+                        SearchCompanyInfo info = setLocationEvent.getCompanyInfo();
+                        if (info == null) {
+                            return;
+                        }
+                        ServiceCompanyProvider
+                                .setLocation(info.getCompanyId(),mLatLng.latitude,mLatLng.longitude,mAltitude)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean aBoolean) throws Exception {
+                                if(!aBoolean){
+                                    Toast.makeText(CompanySearchActivity.this, "设置位置失败，请重试", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(CompanySearchActivity.this, "设置位置成功", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                throwable.printStackTrace();
+                            }
+                        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
+                    }
+                });
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() ==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return true;
@@ -86,9 +169,7 @@ public class CompanySearchActivity extends BaseActivity {
 
                     @Override
                     public void onNext(SearchCompanyInfo value) {
-                        SafeCheckActivity.start(CompanySearchActivity.this, value.getCompanyId(), value.getCsId());
-//                        getDetail(value.getCompanyId());
-//                        OneCompanyMapActivity.start(CompanySearchActivity.this,value.getCompanyId());
+                        OneCompanyMapActivity.start(CompanySearchActivity.this, value.getCompanyId());
                     }
 
                     @Override
@@ -104,55 +185,18 @@ public class CompanySearchActivity extends BaseActivity {
         mBtnSearch.setOnClickListener(mClickListener);
     }
 
-    private void getDetail(String id) {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("请稍后……");
-        progressDialog.show();
-        ServiceCompanyProvider.getCompanyDetail(id)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<CompanyDetailInfo>() {
-
-
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onNext(CompanyDetailInfo value) {
-                        if(value!=null) {
-                            SafeCheckActivity.start(CompanySearchActivity.this, value.getId(), value.getIdStr());
-                        }else{
-                            Toast.makeText(CompanySearchActivity.this, "获取数据为空，请重试", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        progressDialog.dismiss();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        progressDialog.dismiss();
-                    }
-                });
-    }
-
     private View.OnClickListener mClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if(view.getId()==mBtnSearch.getId()){
-                String searchContent =mEdtSearch.getText().toString();
-                if(TextUtils.isEmpty(searchContent)){
+            if (view.getId() == mBtnSearch.getId()) {
+                String searchContent = mEdtSearch.getText().toString();
+                if (TextUtils.isEmpty(searchContent)) {
                     mAdapter.setAll(mDataListForSearch);
                     return;
                 }
                 mAdapter.removeAll();
                 for (SearchCompanyInfo companyInfo : mDataListForSearch) {
-                    if(companyInfo.getCompanyName().contains(searchContent)){
+                    if (companyInfo.getCompanyName().contains(searchContent)) {
                         mAdapter.add(companyInfo);
                     }
                 }
@@ -196,9 +240,8 @@ public class CompanySearchActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mCompositeDisposable.dispose();
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
+        locationService.unregisterListener(mListener); //注销掉监听
+        locationService.stop(); //停止定位服务
     }
 
     public static void start(Context context) {
