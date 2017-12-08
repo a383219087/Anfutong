@@ -14,6 +14,7 @@ import org.chinasafety.cqj.anfutong.model.CompanyInfo;
 import org.chinasafety.cqj.anfutong.model.UserInfo;
 import org.chinasafety.cqj.anfutong.model.provider.GlobalDataProvider;
 import org.chinasafety.cqj.anfutong.utils.AppConstant;
+import org.chinasafety.cqj.anfutong.utils.PermisionUtils;
 import org.chinasafety.cqj.anfutong.utils.SharedPreferenceUtil;
 import org.chinasafety.cqj.anfutong.view.BaseActivity;
 import org.chinasafety.cqj.anfutong.view.fragment.CenterFragment;
@@ -39,6 +40,8 @@ public class HomePageActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+        PermisionUtils.verifyStoragePermissions(this);
+        PermisionUtils.verifyCameraPermissions(this);
         if (initView()) {
             initEvent();
         }
